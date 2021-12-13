@@ -5,35 +5,35 @@ from country.api.serializers import CountrySerializer
 from genre.api.serializers import GenreSerializer
 from country.models import Country
 from django.core.exceptions import ObjectDoesNotExist
-from human.api.serializers import HumanSerializer
-from human.models import Human
+from person.api.serializers import PersonSerializer
+from person.models import Person
+from django.db import transaction
 
 class FilmSerializer(serializers.ModelSerializer):
     country = CountrySerializer(many=True)
     genre = GenreSerializer(many=True)
-    director = HumanSerializer()
+    director = PersonSerializer()
 
+    @transaction.atomic
     def create(self, validated_data):
         countries = validated_data.pop('country', None)
         genries = validated_data.pop('genre', None)
         director = validated_data.pop('director', None)
         if director:
-            director_obj = Human.objects.create(first_name=director['first_name'])
+            director_obj = Person.objects.create(first_name=director['first_name'])
             validated_data['director'] = director_obj
         film = super().create(validated_data)
+        # many to many
+        
+        for country in countries:
+            try:
+                country_obj = Country.objects.get(title=country['title'])
+            except ObjectDoesNotExist:
+                country_obj = Country.objects.create(title=country['title'])
+            film.country.add(country_obj)
+        # students add genre
+        # raise ObjectDoesNotExist 
         return film
-
-
-        # countries_to_add = []
-        # for country in countries:
-        #     try:
-        #         country_obj = Country.objects.get(title=country['title'])
-        #     except:
-        #         country_obj = Country.objects.create(title=country['title'])
-        #     countries_to_add.append(country_obj.id)
-        # new_countries = Country.objects.filter(id__contains=countries_to_add)
-        # film.country.add(new_countries)
-        # film.save()
         
         
 

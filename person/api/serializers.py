@@ -1,8 +1,8 @@
 from django.db.models import fields
 from rest_framework import serializers
-from human.models import Human
+from person.models import Person
 
-class HumanSerializer(serializers.ModelSerializer):
+class PersonSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Human
+        model = Person
         fields = '__all__'
