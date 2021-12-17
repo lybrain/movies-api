@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Film</title>
+</head>
+
+<body>
+    <div>
+        <div>
+            <img alt='poster image' id='film-poster' />
+        </div>
+        <div>
+            <label for="film-title">Название: </label>
+            <span id='film-title'></span>
+        </div>
+        <div>
+            <label for="film-production-year">Год: </label>
+            <span id='film-production-year'></span>
+        </div>
+        <div>
+            <label for="film-slogan">Слоган: </label>
+            <span id='film-slogan'></span>
+        </div>
+        <div>
+            <label for="film-duration">Продолжительность: </label>
+            <span id='film-duration'></span>
+        </div>
+        <div>
+            <label for="film-budget">Бюджет: </label>
+            <span id='film-budget'></span>
+        </div>
+
+    </div>
+    <script>
+        async function getData() {
+            let url = 'http://localhost:8000/api/film/19/';
+            let page = await fetch(url);
+            let data = await page.json();
+            console.log(data);
+            setFilmData(data);
+        }
+
+        function setDataById(id, data) {
+            document.getElementById(id).innerHTML = data;
+        }
+        function setFilmData(film) {
+            const productionYearDate = new Date(film.production_year)
+            setDataById("film-title", film.title);
+            setDataById("film-production-year", productionYearDate.getFullYear());
+            setDataById("film-slogan", film.slogan);
+            setDataById("film-duration", film.duration);
+            setDataById("film-budget", film.finance?.budget ?? "Нет данных");
+            document.getElementById('film-poster').src = film.preview_picture;
+        }
+
+        async function main() {
+            await getData();
+        }
+        main();
+    </script>
+</body>
+
+</html>

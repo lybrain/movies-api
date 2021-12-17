@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Create country</title>
+</head>
+
+<body>
+    <div>
+        <form id="form" >
+            <label for="country">Название: </label>
+            <input id='country' placeholder="Введите название страны"></input>
+            <input type="submit" />
+        </form>
+        <p id='response-msg'></p>
+    </div>
+    <script>
+        async function createCountry(event) {
+            event.preventDefault();
+            const url = 'http://localhost:8000/api/country/';
+            const countryData = document.getElementById('country').value;
+            const countryObj = {
+                title: countryData
+            };
+            let headers = {
+                'Content-type': 'application/json; charset=UTF-8'
+            };
+            let request = {
+                method: "POST",
+                body: JSON.stringify(countryObj),
+                headers
+            };
+            let page = await fetch(url, request);
+            let json = await page.json();
+            console.log(json);
+            document.getElementById('response-msg').innerHTML = 'Вы успешно добавили фильм!'
+        }
+        async function main() {
+            const form = document.getElementById('form');
+            form.addEventListener('submit', createCountry);
+        }
+        main();
+    </script>
+</body>
+
+</html>

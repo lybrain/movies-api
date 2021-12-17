@@ -1,83 +1,53 @@
-from django.http.response import Http404
-from rest_framework import status, mixins, generics
-from rest_framework.response import Response
+from django.http.response import HttpResponse
+from django_filters import CharFilter
+from django_filters.rest_framework import filterset
+from django_filters.rest_framework.backends import DjangoFilterBackend
+from rest_framework import viewsets, permissions
+from rest_framework.decorators import action
 from film.models import Film
-from film.api.serializers import FilmSerializer
+from film.api.serializers import FilmSerializer, HelloWorldSerializer
+from django_filters import FilterSet
+from rest_framework import filters
 
-class FilmCreateListView(mixins.ListModelMixin, mixins.CreateModelMixin, generics.GenericAPIView):
-    queryset = Film.objects.all()
+
+#  __lte -> Less than or equal
+#  __gte -> Greater than or equal
+#  __lt -> Less than
+#  __gt -> Greater than
+
+class FilmFilter(FilterSet):
+    production_year = CharFilter(
+        field_name='production_year', method='production_year_filter')
+
+    def production_year_filter(self, queryset, name, value):
+        return queryset.filter(production_year__year=value)
+        
+    class Meta:
+            model = Film
+            fields = {
+                'production_year': ('lte', 'gte'),
+                'duration': ('exact','lt','gt')
+            }
+
+
+class FilmViewSet(viewsets.ModelViewSet):
+    queryset = Film.objects.select_related('finance').prefetch_related('countries','facts').all()
     serializer_class = FilmSerializer
+    permission_classes = [permissions.AllowAny]
+    filter_backends = [filters.SearchFilter,
+                       filters.OrderingFilter, DjangoFilterBackend]
+    filterset_fields = ['production_year', 'duration','countries__id']
+    search_fields = ['title', 'slogan']
+    ordering_fields = ['production_year']
+    # filter_class = FilmFilter # !!!!!! SWAGGER MAY NOT UPDATE UI BECAUSE OF CACHE !!!!!!
 
-    def get(self, request):
-        data = Film.objects.all()
-        serialized_data = FilmSerializer(data, many=True).data
-        return Response(serialized_data)
+    # detail - on/off ID in request
+    @action(detail=False, methods=['post'], 
+    permission_classes=[permissions.AllowAny], 
+    url_path='hello_world',serializer_class=HelloWorldSerializer)
+    def hello_world(self, request):
+        hello_serializer = HelloWorldSerializer(data=request.data)
+        if hello_serializer.is_valid(raise_exception=True):
+            return HttpResponse(hello_serializer.data['text'])
+        
 
-    def post(self,request):
-        serialized_data = FilmSerializer(data=request.data)
-        if serialized_data.is_valid(): # raise_exception=True
-            serialized_data.save()
-            return Response(serialized_data.data,status=status.HTTP_201_CREATED)
-        else:
-            return Response('Invalid data',status=status.HTTP_400_BAD_REQUEST)
-
-class FilmUpdateDeleteView(mixins.UpdateModelMixin,
-                      mixins.DestroyModelMixin,
-                      generics.GenericAPIView):
-    queryset = Film.objects.all()
-    serializer_class = FilmSerializer
-
-    def get_object(self, id):
-        try:
-            return Film.objects.get(id=id)
-        except Film.DoesNotExist:
-            raise Http404
-
-    def get(self, request, id):
-        wish_msg = self.get_object(id)
-        serializer = FilmSerializer(wish_msg)
-        return Response(serializer.data)
-
-    def put(self, request, id):
-        wish_msg = self.get_object(id)
-        serializer = FilmSerializer(wish_msg, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    def patch(self, request, id):
-        wish_msg = self.get_object(id)
-        serializer = FilmSerializer(
-            wish_msg, data=request.data, partial=True)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    def delete(self, request, id):
-        wish_msg = self.get_object(id)
-        wish_msg.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
-
-
-
-
-
-# class FilmCreateListView(mixins.ListModelMixin,
-#                                 mixins.CreateModelMixin,
-#                                 generics.GenericAPIView):
-#     queryset = Film.objects.all()
-#     serializer_class = FilmSerializer
-
-#     def get(self, request):
-#         serializer = FilmSerializer(Film.objects.all(), many=True)
-#         return Response(serializer.data)
-
-#     def post(self, request):  # post
-#         serializer = self.get_serializer(data=request.data,context={'request_method': request.method})
-#         if serializer.is_valid(raise_exception=True):
-#             serializer.save()
-#             return Response(serializer.data)
-#         else:
-#             return Response(status=status.HTTP_400_BAD_REQUEST)
