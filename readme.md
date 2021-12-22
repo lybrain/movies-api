@@ -3,7 +3,7 @@
 <p>python manage.py loaddata countries.json </p>
 <p>2. Run server </p>
 <p>python manage.py runserver</p>
-# Run docker
+<h1>Run docker</h1>
 <p>1. Inside movies_api folder build image</p>
 <p>docker build -t movies_api .</p>
 <p>2. Run container with volume </p>
