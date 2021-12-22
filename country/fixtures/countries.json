@@ -1,0 +1,16 @@
+[
+    {
+      "model": "country.country",
+      "pk": 1,
+      "fields": {
+        "title":"Moscow"
+      }
+    },
+    {
+      "model": "country.country",
+      "pk": 2,
+      "fields": {
+        "title":"Saint-Petersburg"
+      }
+    }
+  ]
