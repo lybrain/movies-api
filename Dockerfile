@@ -3,27 +3,24 @@ FROM python:3.9
 # creates directory
 WORKDIR /movies_api 
 
-# copy all files with name Pipfile to docker ./
-COPY Pipfile* ./ 
+# copy all files with name Pipfile to docker /movies_api/ 
+COPY Pipfile* /movies_api/ 
 
 # install pipenv and all dependencies
 
-# You won't have any unnecessary cache files left over using => --no-cache-dir option for pip 
-# and => --clear option for pipenv
+# Remove cache for pip => "--no-cache-dir" and => "--clear" for pipenv
 
 # install dependencies on system because docker not need for virtual env => --system
 
-# --deploy only works if you already have a lockfile -- 
-# by default pipenv will compare your lockfile to your pipfile 
-# (in both cases, assuming you have one), and if your lockfile is not in sync, 
-# it will re-lock and re-install. When you pass the --deploy flag, 
-# pipenv will instead fail with an error and let you know that 
-# things are out of sync, rather than implicitly installing the new things. 
+# lockfile - declares all dependencies(and sub-dependencies)
+# --deploy - raise error if your lockfile is not in sync with pipfile
+# by default it will re-lock and re-install
+# P.S. only works if you already have a lockfile -- 
 RUN pip install --no-cache-dir pipenv && \
     pipenv install --system --deploy --clear 
 
-# copy all files from local folder to docker ./
-COPY . ./ 
+# copy all files from local folder to docker /movies_api/ 
+COPY . /movies_api/ 
 # apply migrations
 RUN python manage.py migrate 
 
