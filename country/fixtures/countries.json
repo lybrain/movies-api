@@ -3,14 +3,14 @@
       "model": "country.country",
       "pk": 1,
       "fields": {
-        "title":"Moscow"
+        "title":"Russia"
       }
     },
     {
       "model": "country.country",
       "pk": 2,
       "fields": {
-        "title":"Saint-Petersburg"
+        "title":"Kyrgyzstan"
       }
     }
   ]
