@@ -22,7 +22,6 @@ RUN pip install --no-cache-dir pipenv && \
 # copy all files from local folder to docker /movies_api/ 
 COPY . /movies_api/ 
 # apply migrations
-RUN python manage.py migrate 
 
 # listen to port 8000
 EXPOSE 8000 
