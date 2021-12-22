@@ -1,10 +1,10 @@
 # Run local
-1. Apply init data
-python manage.py loaddata countries.json 
-2. Run server 
-python manage.py runserver
+<p>1. Apply init data</p>
+<p>python manage.py loaddata countries.json </p>
+<p>2. Run server </p>
+<p>python manage.py runserver</p>
 # Run docker
-1. Inside movies_api folder build image
-docker build -t movies_api .
-2. Run container with volume 
-docker run -dp 8000:8000 -v /root/movies_api:./movies_api --name movies_api movies_api
+<p>1. Inside movies_api folder build image</p>
+<p>docker build -t movies_api .</p>
+<p>2. Run container with volume </p>
+<p>docker run -dp 8000:8000 -v /root/movies_api:./movies_api --name movies_api movies_api</p>
